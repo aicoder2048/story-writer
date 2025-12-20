@@ -15,3 +15,9 @@ wheels/
 小慢的星光壳/
 悦悦的时空旅行/
 慢半拍/
+
+# Excluded command files
+.claude/commands/xianyan_writer.md
+
+# Excluded skills
+.claude/skills/xianyan-skill/
