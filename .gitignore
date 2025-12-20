@@ -10,6 +10,7 @@ wheels/
 .venv
 
 # Story project directories
+AI童年/
 免疫之光/
 免疫之光_V2/
 小慢的星光壳/
@@ -21,3 +22,7 @@ wheels/
 
 # Excluded skills
 .claude/skills/xianyan-skill/
+
+# Story specs
+story_specs/AI童年.md
+story_specs/免疫之光.md
