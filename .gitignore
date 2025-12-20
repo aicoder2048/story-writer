@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Story project directories
+免疫之光/
+免疫之光_V2/
+小慢的星光壳/
+悦悦的时空旅行/
+慢半拍/
