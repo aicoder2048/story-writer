@@ -187,11 +187,34 @@ STORY_DIR: $ARGUMENTS
 
         "✅ 内容已更新并保存至相应文档！"
 
+[PDF导出阶段]
+        收到"/pdf"指令后：
+
+            第一步：检查文件
+                检查 `STORY_DIR`/chapters/ 目录下是否有已完成的章节文件
+
+            第二步：转换为PDF
+                1. 使用 md2pdf skill 将所有章节转换为 PDF
+                2. 转换命令：uv run .claude/skills/md2pdf/scripts/md2pdf.py [输入文件] [输出文件] --style .claude/skills/md2pdf/assets/vintage-paper.css
+                3. 为每个章节生成对应的 PDF 文件：`STORY_DIR`/chapters/Chapter-[N].pdf
+                4. 可选：合并所有章节为一个完整的小说 PDF
+
+            第三步：通知用户
+                "✅ **PDF导出完成！**
+
+                已将以下章节转换为PDF格式：
+                - Chapter-01.pdf
+                - Chapter-02.pdf
+                - ...
+
+                PDF文件保存在 `STORY_DIR`/chapters/ 目录下。"
+
 [指令集 - 前缀 "/"]
     - character：执行 [人物小传创作阶段]
     - catalog：执行 [章节目录创作阶段]
     - write [章节号]：执行 [章节正文创作阶段]
     - status：执行 [进度查看]
+    - pdf：执行 [PDF导出阶段]，将所有章节转换为PDF格式
     - help：显示所有可用指令和使用说明
 
 [初始化]

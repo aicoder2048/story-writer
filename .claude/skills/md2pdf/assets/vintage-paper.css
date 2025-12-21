@@ -1,0 +1,203 @@
+/*
+ * Vintage Paper Style for Chinese Story PDFs
+ *
+ * This CSS provides a warm, book-like appearance suitable for
+ * Chinese literature and stories.
+ *
+ * Customization Guide:
+ * - Background color: Modify @page and body background-color
+ * - Text color: Modify body color and h1/h2/h3 color
+ * - Font: Modify font-family (ensure Chinese fonts are available)
+ * - Margins: Modify @page margin
+ * - Font size: Modify body font-size
+ */
+
+@page {
+    size: A4;
+    margin: 2.5cm 2cm;
+    background-color: #FAF6F0;  /* Warm cream background */
+
+    @bottom-center {
+        content: counter(page);
+        font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+        font-size: 10pt;
+        color: #6B5344;
+    }
+}
+
+body {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+    font-size: 12pt;
+    line-height: 1.8;
+    color: #4A3728;  /* Dark brown text */
+    background-color: #FAF6F0;
+    text-align: justify;
+}
+
+/* ============================================
+   Headings
+   ============================================ */
+
+h1 {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+    font-size: 24pt;
+    font-weight: bold;
+    color: #3D2B1F;  /* Darker brown for headings */
+    margin-top: 0;
+    margin-bottom: 1.5em;
+    text-align: left;
+    border-bottom: none;
+}
+
+h2 {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+    font-size: 18pt;
+    font-weight: bold;
+    color: #3D2B1F;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+}
+
+h3 {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+    font-size: 14pt;
+    font-weight: bold;
+    color: #3D2B1F;
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+}
+
+/* ============================================
+   Paragraphs
+   ============================================ */
+
+p {
+    margin-bottom: 1em;
+    text-indent: 2em;  /* Chinese style paragraph indent */
+}
+
+/* First paragraph after heading - no indent */
+h1 + p, h2 + p, h3 + p, hr + p {
+    text-indent: 0;
+}
+
+/* ============================================
+   Blockquotes
+   ============================================ */
+
+blockquote {
+    margin: 1.5em 2em;
+    padding: 0.5em 1em;
+    border-left: 3px solid #8B7355;
+    color: #5D4E37;
+    font-style: italic;
+    background-color: rgba(139, 115, 85, 0.1);
+}
+
+/* ============================================
+   Horizontal Rules - Section Dividers
+   ============================================ */
+
+hr {
+    border: none;
+    border-top: 1px solid #C4B5A5;
+    margin: 2em auto;
+    width: 40%;
+}
+
+/* ============================================
+   Code Blocks
+   ============================================ */
+
+code {
+    font-family: "Source Code Pro", "Menlo", "Courier New", monospace;
+    font-size: 10pt;
+    background-color: rgba(139, 115, 85, 0.15);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+pre {
+    background-color: rgba(139, 115, 85, 0.1);
+    padding: 1em;
+    border-radius: 5px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+
+/* ============================================
+   Lists
+   ============================================ */
+
+ul, ol {
+    margin-bottom: 1em;
+    padding-left: 2em;
+}
+
+li {
+    margin-bottom: 0.3em;
+}
+
+/* ============================================
+   Links
+   ============================================ */
+
+a {
+    color: #6B5344;
+    text-decoration: none;
+    border-bottom: 1px dotted #6B5344;
+}
+
+/* ============================================
+   Emphasis
+   ============================================ */
+
+strong {
+    font-weight: bold;
+    color: #3D2B1F;
+}
+
+em {
+    font-style: italic;
+}
+
+/* ============================================
+   Tables
+   ============================================ */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+}
+
+th, td {
+    border: 1px solid #C4B5A5;
+    padding: 0.5em 1em;
+    text-align: left;
+}
+
+th {
+    background-color: rgba(139, 115, 85, 0.2);
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: rgba(139, 115, 85, 0.05);
+}
+
+/* ============================================
+   Images
+   ============================================ */
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1em auto;
+}

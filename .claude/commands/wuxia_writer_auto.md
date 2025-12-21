@@ -100,7 +100,7 @@ model: claude-opus-4-5-20251101
     [第二阶段：故事大纲]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [1/8] 正在创作故事大纲... ⏱️ {当前时间}」
+            2. 输出：「📝 [1/9] 正在创作故事大纲... ⏱️ {当前时间}」
 
         第二步：调用Skill并创作
             1. 调用 wuxia-skill 获取大纲创作指导
@@ -115,7 +115,7 @@ model: claude-opus-4-5-20251101
     [第三阶段：人物小传]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [2/8] 正在创作人物小传... ⏱️ {当前时间}」
+            2. 输出：「📝 [2/9] 正在创作人物小传... ⏱️ {当前时间}」
             3. 读取 $1/outline.md 了解故事背景
 
         第二步：调用Skill并创作
@@ -131,7 +131,7 @@ model: claude-opus-4-5-20251101
     [第四阶段：章节目录]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [3/8] 正在规划章节目录... ⏱️ {当前时间}」
+            2. 输出：「📝 [3/9] 正在规划章节目录... ⏱️ {当前时间}」
             3. 读取 $1/outline.md 和 $1/character.md 了解故事脉络和人物设定
 
         第二步：调用Skill并创作
@@ -147,7 +147,7 @@ model: claude-opus-4-5-20251101
     [第五阶段：第1章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [4/8] 正在创作第1章... ⏱️ {当前时间}」
+            2. 输出：「📝 [4/9] 正在创作第1章... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
 
         第二步：调用Skill并创作
@@ -163,7 +163,7 @@ model: claude-opus-4-5-20251101
     [第六阶段：第2章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [5/8] 正在创作第2章... ⏱️ {当前时间}」
+            2. 输出：「📝 [5/9] 正在创作第2章... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
             4. 读取 Chapter-01.md 了解前文
 
@@ -180,7 +180,7 @@ model: claude-opus-4-5-20251101
     [第七阶段：第3章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [6/8] 正在创作第3章... ⏱️ {当前时间}」
+            2. 输出：「📝 [6/9] 正在创作第3章... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
             4. 读取 Chapter-02.md 了解前文
 
@@ -197,7 +197,7 @@ model: claude-opus-4-5-20251101
     [第八阶段：第4章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [7/8] 正在创作第4章... ⏱️ {当前时间}」
+            2. 输出：「📝 [7/9] 正在创作第4章... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
             4. 读取 Chapter-03.md 了解前文
 
@@ -214,7 +214,7 @@ model: claude-opus-4-5-20251101
     [第九阶段：第5章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [8/8] 正在创作第5章（大结局）... ⏱️ {当前时间}」
+            2. 输出：「📝 [8/9] 正在创作第5章（大结局）... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
             4. 读取 Chapter-04.md 了解前文
 
@@ -228,7 +228,27 @@ model: claude-opus-4-5-20251101
             2. 计算耗时
             3. 输出：「✅ 第5章已完成 (耗时: X分X秒)」
 
-    [第十阶段：完成报告]
+    [第十阶段：PDF导出]
+        第一步：记录开始时间并输出进度
+            1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
+            2. 输出：「📄 [9/9] 正在导出PDF文件... ⏱️ {当前时间}」
+
+        第二步：转换所有章节为PDF
+            1. 使用 md2pdf skill 将每个章节转换为 PDF
+            2. 转换命令：uv run .claude/skills/md2pdf/scripts/md2pdf.py [输入文件] [输出文件] --style .claude/skills/md2pdf/assets/vintage-paper.css
+            3. 依次转换：
+               - $1/chapters/Chapter-01.md → $1/chapters/Chapter-01.pdf
+               - $1/chapters/Chapter-02.md → $1/chapters/Chapter-02.pdf
+               - $1/chapters/Chapter-03.md → $1/chapters/Chapter-03.pdf
+               - $1/chapters/Chapter-04.md → $1/chapters/Chapter-04.pdf
+               - $1/chapters/Chapter-05.md → $1/chapters/Chapter-05.pdf
+
+        第三步：计算耗时并输出完成
+            1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
+            2. 计算耗时
+            3. 输出：「✅ PDF导出完成 (耗时: X分X秒)」
+
+    [第十一阶段：完成报告]
         1. 使用 Bash 执行 `date "+%Y-%m-%d %H:%M:%S"` 获取总结束时间
         2. 计算总耗时
         3. 统计各章节字数
@@ -250,6 +270,13 @@ model: claude-opus-4-5-20251101
            ├── Chapter-03.md    - 第三章
            ├── Chapter-04.md    - 第四章
            └── Chapter-05.md    - 第五章
+
+        📄 $1/chapters/ (PDF版本)
+           ├── Chapter-01.pdf   - 第一章
+           ├── Chapter-02.pdf   - 第二章
+           ├── Chapter-03.pdf   - 第三章
+           ├── Chapter-04.pdf   - 第四章
+           └── Chapter-05.pdf   - 第五章
 
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         📊 **字数统计**
@@ -275,6 +302,7 @@ model: claude-opus-4-5-20251101
         第3章：X分X秒
         第4章：X分X秒
         第5章：X分X秒
+        PDF导出：X分X秒
         ─────────────────
         开始时间：{START_TIME}
         结束时间：{END_TIME}
@@ -284,4 +312,4 @@ model: claude-opus-4-5-20251101
 
 [初始化]
     执行 [第一阶段：初始化与参数解析]
-    然后依次执行 [第二阶段] 到 [第十阶段]
+    然后依次执行 [第二阶段] 到 [第十一阶段]
