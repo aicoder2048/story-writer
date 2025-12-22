@@ -18,10 +18,10 @@ AI童年/
 悦悦的时空旅行/
 慢半拍/
 文明的最后一个变量/
-文明的最后一个变量_V3/
-文明的最后一个变量_V3_V1/
+文明的最后一个变量_V4/
 龙吟月下/
 龙吟月下_V2/
+我的世界/
 
 # Excluded command files
 .claude/commands/xianyan_writer.md
@@ -32,3 +32,10 @@ AI童年/
 # Story specs
 story_specs/AI童年.md
 story_specs/免疫之光.md
+story_specs/我的世界.md
+
+# Chinese fonts (too large for GitHub)
+.claude/skills/canvas-design/canvas-fonts/HeitiSC-Medium.ttc
+.claude/skills/canvas-design/canvas-fonts/HiraginoSansGB.ttc
+.claude/skills/canvas-design/canvas-fonts/PingFangSC.ttc
+.claude/skills/canvas-design/canvas-fonts/SongtiSC.ttc
