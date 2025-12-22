@@ -12,8 +12,11 @@ model: claude-opus-4-5-20251101
     基于用户提供的故事名和story_spec文件，自动完成科幻短篇小说的全流程创作。无需用户交互，一键生成完整作品。
 
 [参数]
-    $1: 故事名（用于创建项目目录）
+    $1: 故事名（用于创建项目目录和章节文件命名）
     $2: story_spec文件路径（包含Q1核心创意、Q2核心冲突、Q3故事调性，以及可选的扩展设定和素材）
+
+[动态变量]
+    STORY_NAME: $1
 
 [技能]
     - **创作能力**：具备扎实的小说创作功底，能够构思故事、塑造人物、编写情节
@@ -27,16 +30,20 @@ model: claude-opus-4-5-20251101
 
 [文件结构]
     project/
-    ├── $1/                          # 故事项目根目录（以故事名命名）
+    ├── `STORY_NAME`/                # 故事项目根目录（以故事名命名）
     │   ├── outline.md               # 故事大纲
     │   ├── character.md             # 人物小传
     │   ├── chapter_index.md         # 章节目录
+    │   ├── `STORY_NAME`.pdf         # 完整故事PDF（含书籍封面和所有章节）
     │   └── chapters/                # 章节正文目录
-    │       ├── Chapter-01.md
-    │       ├── Chapter-02.md
-    │       ├── Chapter-03.md
-    │       ├── Chapter-04.md
-    │       └── Chapter-05.md
+    │       ├── `STORY_NAME`-01.md
+    │       ├── `STORY_NAME`-02.md
+    │       ├── `STORY_NAME`-03.md
+    │       ├── `STORY_NAME`-04.md
+    │       ├── `STORY_NAME`-05.md
+    │       ├── Cover-0.pdf          # 书籍封面（整本书）
+    │       ├── Cover-1.pdf ~ Cover-5.pdf  # 章节封面
+    │       └── cover-philosophy.md  # 封面设计哲学
     └── story_specs/
         └── $2                       # 故事规格文件（用户提供）
 
@@ -80,7 +87,7 @@ model: claude-opus-4-5-20251101
         2. 显示启动信息：
            "🚀 **科幻自动创作系统启动**
 
-            📖 故事名：$1
+            📖 故事名：`STORY_NAME`
             📄 规格文件：$2
             🕐 开始时间：{START_TIME}
 
@@ -94,18 +101,18 @@ model: claude-opus-4-5-20251101
            - 相关素材（如有）
 
         4. 创建目录结构：
-           - 创建 $1/ 目录
-           - 创建 $1/chapters/ 目录
+           - 创建 `STORY_NAME`/ 目录
+           - 创建 `STORY_NAME`/chapters/ 目录
 
     [第二阶段：故事大纲]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [1/9] 正在创作故事大纲... ⏱️ {当前时间}」
+            2. 输出：「📝 [1/11] 正在创作故事大纲... ⏱️ {当前时间}」
 
         第二步：调用Skill并创作
             1. 调用 kehuan-skill 获取大纲创作指导
             2. 基于skill指导和story_spec内容创作完整故事大纲
-            3. 写入 $1/outline.md
+            3. 写入 `STORY_NAME`/outline.md
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
@@ -115,13 +122,13 @@ model: claude-opus-4-5-20251101
     [第三阶段：人物小传]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [2/9] 正在创作人物小传... ⏱️ {当前时间}」
-            3. 读取 $1/outline.md 了解故事背景
+            2. 输出：「📝 [2/11] 正在创作人物小传... ⏱️ {当前时间}」
+            3. 读取 `STORY_NAME`/outline.md 了解故事背景
 
         第二步：调用Skill并创作
             1. 调用 kehuan-skill 获取人物塑造指导
             2. 基于skill指导和大纲创作人物小传
-            3. 写入 $1/character.md
+            3. 写入 `STORY_NAME`/character.md
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
@@ -131,13 +138,13 @@ model: claude-opus-4-5-20251101
     [第四阶段：章节目录]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [3/9] 正在规划章节目录... ⏱️ {当前时间}」
-            3. 读取 $1/outline.md 和 $1/character.md 了解故事脉络和人物设定
+            2. 输出：「📝 [3/11] 正在规划章节目录... ⏱️ {当前时间}」
+            3. 读取 `STORY_NAME`/outline.md 和 `STORY_NAME`/character.md 了解故事脉络和人物设定
 
         第二步：调用Skill并创作
             1. 调用 kehuan-skill 获取章节规划指导
             2. 基于skill指导设计5章目录，与大纲起承转合对应
-            3. 写入 $1/chapter_index.md
+            3. 写入 `STORY_NAME`/chapter_index.md
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
@@ -147,13 +154,13 @@ model: claude-opus-4-5-20251101
     [第五阶段：第1章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [4/9] 正在创作第1章... ⏱️ {当前时间}」
+            2. 输出：「📝 [4/11] 正在创作第1章... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
 
         第二步：调用Skill并创作
             1. 调用 kehuan-skill 获取写作风格指导
             2. 基于skill指导创作第1章正文（2000-3000字）
-            3. 写入 $1/chapters/Chapter-01.md
+            3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-01.md
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
@@ -163,14 +170,14 @@ model: claude-opus-4-5-20251101
     [第六阶段：第2章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [5/9] 正在创作第2章... ⏱️ {当前时间}」
+            2. 输出：「📝 [5/11] 正在创作第2章... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
-            4. 读取 Chapter-01.md 了解前文
+            4. 读取 `STORY_NAME`-01.md 了解前文
 
         第二步：调用Skill并创作
             1. 调用 kehuan-skill 获取写作风格指导
             2. 基于skill指导创作第2章正文（2000-3000字）
-            3. 写入 $1/chapters/Chapter-02.md
+            3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-02.md
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
@@ -180,14 +187,14 @@ model: claude-opus-4-5-20251101
     [第七阶段：第3章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [6/9] 正在创作第3章... ⏱️ {当前时间}」
+            2. 输出：「📝 [6/11] 正在创作第3章... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
-            4. 读取 Chapter-02.md 了解前文
+            4. 读取 `STORY_NAME`-02.md 了解前文
 
         第二步：调用Skill并创作
             1. 调用 kehuan-skill 获取写作风格指导
             2. 基于skill指导创作第3章正文（2000-3000字）
-            3. 写入 $1/chapters/Chapter-03.md
+            3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-03.md
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
@@ -197,14 +204,14 @@ model: claude-opus-4-5-20251101
     [第八阶段：第4章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [7/9] 正在创作第4章... ⏱️ {当前时间}」
+            2. 输出：「📝 [7/11] 正在创作第4章... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
-            4. 读取 Chapter-03.md 了解前文
+            4. 读取 `STORY_NAME`-03.md 了解前文
 
         第二步：调用Skill并创作
             1. 调用 kehuan-skill 获取写作风格指导
             2. 基于skill指导创作第4章正文（2000-3000字）
-            3. 写入 $1/chapters/Chapter-04.md
+            3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-04.md
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
@@ -214,14 +221,14 @@ model: claude-opus-4-5-20251101
     [第九阶段：第5章]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📝 [8/9] 正在创作第5章（大结局）... ⏱️ {当前时间}」
+            2. 输出：「📝 [8/11] 正在创作第5章（大结局）... ⏱️ {当前时间}」
             3. 读取 outline.md、character.md、chapter_index.md
-            4. 读取 Chapter-04.md 了解前文
+            4. 读取 `STORY_NAME`-04.md 了解前文
 
         第二步：调用Skill并创作
             1. 调用 kehuan-skill 获取写作风格指导
             2. 基于skill指导创作第5章正文（2000-3000字）
-            3. 写入 $1/chapters/Chapter-05.md
+            3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-05.md
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
@@ -231,52 +238,111 @@ model: claude-opus-4-5-20251101
     [第十阶段：PDF导出]
         第一步：记录开始时间并输出进度
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
-            2. 输出：「📄 [9/9] 正在导出PDF文件... ⏱️ {当前时间}」
+            2. 输出：「📄 [9/11] 正在导出PDF文件... ⏱️ {当前时间}」
 
         第二步：转换所有章节为PDF
             1. 使用 md2pdf skill 将每个章节转换为 PDF
             2. 转换命令：uv run .claude/skills/md2pdf/scripts/md2pdf.py [输入文件] [输出文件] --style .claude/skills/md2pdf/assets/vintage-paper.css
             3. 依次转换：
-               - $1/chapters/Chapter-01.md → $1/chapters/Chapter-01.pdf
-               - $1/chapters/Chapter-02.md → $1/chapters/Chapter-02.pdf
-               - $1/chapters/Chapter-03.md → $1/chapters/Chapter-03.pdf
-               - $1/chapters/Chapter-04.md → $1/chapters/Chapter-04.pdf
-               - $1/chapters/Chapter-05.md → $1/chapters/Chapter-05.pdf
+               - `STORY_NAME`/chapters/`STORY_NAME`-01.md → `STORY_NAME`/chapters/`STORY_NAME`-01.pdf
+               - `STORY_NAME`/chapters/`STORY_NAME`-02.md → `STORY_NAME`/chapters/`STORY_NAME`-02.pdf
+               - `STORY_NAME`/chapters/`STORY_NAME`-03.md → `STORY_NAME`/chapters/`STORY_NAME`-03.pdf
+               - `STORY_NAME`/chapters/`STORY_NAME`-04.md → `STORY_NAME`/chapters/`STORY_NAME`-04.pdf
+               - `STORY_NAME`/chapters/`STORY_NAME`-05.md → `STORY_NAME`/chapters/`STORY_NAME`-05.pdf
 
         第三步：计算耗时并输出完成
             1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
             2. 计算耗时
             3. 输出：「✅ PDF导出完成 (耗时: X分X秒)」
 
-    [第十一阶段：完成报告]
+    [第十一阶段：封面创作与完整故事合并]
+        第一步：记录开始时间并输出进度
+            1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录阶段开始时间
+            2. 输出：「🎨 [10/11] 正在创作封面与合并故事... ⏱️ {当前时间}」
+
+        第二步：读取章节信息
+            1. 读取 `STORY_NAME`/chapter_index.md 提取所有章节的信息
+            2. 解析每个章节的：章节号、章节标题、章节描述
+            3. 将章节信息存储为列表供后续循环使用
+
+        第三步：创建设计哲学（统一风格）
+            1. 调用 canvas-design skill 创建一个统一的设计哲学
+            2. 设计哲学应体现科幻小说的氛围：宇宙感、科技感、未来感
+            3. **重要**：封面背景色主题必须使用浅色系（如米白、浅灰、淡金等），与内容PDF的vintage-paper风格保持视觉一致性
+            4. 将设计哲学保存为 `STORY_NAME`/chapters/cover-philosophy.md
+            5. 此设计哲学将用于书籍封面和所有章节封面，确保风格一致
+
+        第四步：创建书籍封面（Cover-0）
+            1. 输出进度：「🎨 正在创建书籍封面...」
+            2. 调用 canvas-design skill，传入以下信息：
+               - 故事名称：`STORY_NAME`
+               - 类型：书籍封面（整本书的封面，不是章节封面）
+               - 使用已创建的设计哲学确保风格一致
+               - 封面上必须清晰显示：中文故事名称、作者信息（可选）
+               - 设计应更加大气、庄重，体现整部作品的主题
+            3. 将封面保存为 `STORY_NAME`/chapters/Cover-0.pdf
+            4. 输出完成：「✅ 书籍封面已创建」
+
+        第五步：循环创建章节封面
+            对于每个章节（1-5），依次执行：
+            1. 输出进度：「🎨 正在创建第[N]章封面...」
+            2. 调用 canvas-design skill，传入以下信息：
+               - 故事名称：`STORY_NAME`
+               - 章节号：第[N]章
+               - 章节标题（如有）
+               - 章节描述（从chapter_index.md提取）
+               - 使用已创建的设计哲学确保风格一致
+               - 封面上必须清晰显示：中文故事名称、中文章节号、中文章节标题
+            3. 将封面保存为 `STORY_NAME`/chapters/Cover-[N].pdf
+            4. 调用 pdf skill 将封面合并到章节PDF前面：
+               - 输入：Cover-[N].pdf + `STORY_NAME`-[N].pdf
+               - 输出：覆盖 `STORY_NAME`-[N].pdf（原文件被替换为带封面版本）
+            5. 输出完成：「✅ 第[N]章封面已创建并合并」
+
+        第六步：合并完整故事PDF
+            1. 输出进度：「📚 正在合并完整故事...」
+            2. 调用 pdf skill 合并所有PDF：
+               - 输入顺序：Cover-0.pdf + `STORY_NAME`-01.pdf + `STORY_NAME`-02.pdf + `STORY_NAME`-03.pdf + `STORY_NAME`-04.pdf + `STORY_NAME`-05.pdf
+               - 输出：`STORY_NAME`/`STORY_NAME`.pdf（完整故事PDF）
+            3. 输出完成：「✅ 完整故事PDF已生成」
+
+        第七步：计算耗时并输出完成
+            1. 使用 Bash 执行 `date "+%H:%M:%S"` 记录结束时间
+            2. 计算耗时
+            3. 输出：「✅ 封面创作与合并完成 (耗时: X分X秒)」
+
+    [第十二阶段：完成报告]
         1. 使用 Bash 执行 `date "+%Y-%m-%d %H:%M:%S"` 获取总结束时间
         2. 计算总耗时
         3. 统计各章节字数
         4. 输出完成报告：
 
-        "🎉 **科幻短篇小说《$1》创作完成！**
+        "🎉 **科幻短篇小说《`STORY_NAME`》创作完成！**
 
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         📁 **生成文件**
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        📋 $1/outline.md         - 故事大纲
-        👥 $1/character.md       - 人物小传
-        📑 $1/chapter_index.md   - 章节目录
+        📋 `STORY_NAME`/outline.md         - 故事大纲
+        👥 `STORY_NAME`/character.md       - 人物小传
+        📑 `STORY_NAME`/chapter_index.md   - 章节目录
+        📚 `STORY_NAME`/`STORY_NAME`.pdf   - 完整故事PDF（含书籍封面和所有章节）
 
-        📖 $1/chapters/
-           ├── Chapter-01.md    - 第一章
-           ├── Chapter-02.md    - 第二章
-           ├── Chapter-03.md    - 第三章
-           ├── Chapter-04.md    - 第四章
-           └── Chapter-05.md    - 第五章
+        📖 `STORY_NAME`/chapters/
+           ├── `STORY_NAME`-01.md    - 第一章
+           ├── `STORY_NAME`-02.md    - 第二章
+           ├── `STORY_NAME`-03.md    - 第三章
+           ├── `STORY_NAME`-04.md    - 第四章
+           └── `STORY_NAME`-05.md    - 第五章
 
-        📄 $1/chapters/ (PDF版本)
-           ├── Chapter-01.pdf   - 第一章
-           ├── Chapter-02.pdf   - 第二章
-           ├── Chapter-03.pdf   - 第三章
-           ├── Chapter-04.pdf   - 第四章
-           └── Chapter-05.pdf   - 第五章
+        📄 `STORY_NAME`/chapters/ (PDF版本)
+           ├── Cover-0.pdf           - 书籍封面
+           ├── `STORY_NAME`-01.pdf   - 第一章（含章节封面）
+           ├── `STORY_NAME`-02.pdf   - 第二章（含章节封面）
+           ├── `STORY_NAME`-03.pdf   - 第三章（含章节封面）
+           ├── `STORY_NAME`-04.pdf   - 第四章（含章节封面）
+           ├── `STORY_NAME`-05.pdf   - 第五章（含章节封面）
+           └── cover-philosophy.md   - 封面设计哲学
 
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         📊 **字数统计**
@@ -303,6 +369,7 @@ model: claude-opus-4-5-20251101
         第4章：X分X秒
         第5章：X分X秒
         PDF导出：X分X秒
+        封面与合并：X分X秒
         ─────────────────
         开始时间：{START_TIME}
         结束时间：{END_TIME}
@@ -312,4 +379,4 @@ model: claude-opus-4-5-20251101
 
 [初始化]
     执行 [第一阶段：初始化与参数解析]
-    然后依次执行 [第二阶段] 到 [第十一阶段]
+    然后依次执行 [第二阶段] 到 [第十二阶段]

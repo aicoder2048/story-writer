@@ -11,7 +11,8 @@ model: claude-opus-4-5-20251101
 [任务]
     完成科幻短篇小说的完整创作工作，包括故事构思、人物塑造、章节规划、正文写作。在每个创作阶段调用kehuan-skill获取专业指导，基于这些指导进行创作，为用户提供高质量的科幻小说作品。
 
-[故事目录]
+[动态变量]
+STORY_NAME: $ARGUMENTS
 STORY_DIR: $ARGUMENTS
 
 [技能]
@@ -30,10 +31,14 @@ STORY_DIR: $ARGUMENTS
     │   ├── outline.md               # 故事大纲
     │   ├── character.md             # 人物小传
     │   ├── chapter_index.md         # 章节目录
+    │   ├── `STORY_NAME`.pdf         # 完整故事PDF（含书籍封面和所有章节）
     │   └── chapters/                # 章节正文目录
-    │       ├── Chapter-01.md
-    │       ├── Chapter-02.md
+    │       ├── `STORY_NAME`-01.md
+    │       ├── `STORY_NAME`-02.md
     │       └── ...
+    │       ├── Cover-0.pdf          # 书籍封面（整本书）
+    │       ├── Cover-1.pdf ~ Cover-5.pdf  # 章节封面
+    │       └── cover-philosophy.md  # 封面设计哲学
     └── .claude/
         ├── CLAUDE.md                # 项目规则和主Agent配置
         └── skills/
@@ -142,10 +147,10 @@ STORY_DIR: $ARGUMENTS
                 1. 调用 kehuan-skill 获取写作风格指导
                 2. 基于skill指导创作章节正文
                 3. 章节字数：2000-3000字（可根据用户需求调整）
-                4. 写入 `STORY_DIR`/chapters/Chapter-[N].md
+                4. 写入 `STORY_DIR`/chapters/`STORY_NAME`-[N].md
 
             第三步：通知用户
-                "✅ **第[N]章已保存至 `STORY_DIR`/chapters/Chapter-[N].md**
+                "✅ **第[N]章已保存至 `STORY_DIR`/chapters/`STORY_NAME`-[N].md**
 
                 这一章的内容写好了！
 
@@ -196,18 +201,87 @@ STORY_DIR: $ARGUMENTS
             第二步：转换为PDF
                 1. 使用 md2pdf skill 将所有章节转换为 PDF
                 2. 转换命令：uv run .claude/skills/md2pdf/scripts/md2pdf.py [输入文件] [输出文件] --style .claude/skills/md2pdf/assets/vintage-paper.css
-                3. 为每个章节生成对应的 PDF 文件：`STORY_DIR`/chapters/Chapter-[N].pdf
+                3. 为每个章节生成对应的 PDF 文件：`STORY_DIR`/chapters/`STORY_NAME`-[N].pdf
                 4. 可选：合并所有章节为一个完整的小说 PDF
 
             第三步：通知用户
                 "✅ **PDF导出完成！**
 
                 已将以下章节转换为PDF格式：
-                - Chapter-01.pdf
-                - Chapter-02.pdf
+                - `STORY_NAME`-01.pdf
+                - `STORY_NAME`-02.pdf
                 - ...
 
                 PDF文件保存在 `STORY_DIR`/chapters/ 目录下。"
+
+[章节封面创作阶段]
+        收到"/covers"指令后：
+
+            第一步：读取章节信息
+                1. 读取 `STORY_DIR`/chapter_index.md 提取所有章节的信息
+                2. 解析每个章节的：章节号、章节标题、章节描述
+                3. 将章节信息存储为列表供后续循环使用
+
+            第二步：创建设计哲学（统一风格）
+                1. 调用 canvas-design skill 创建一个统一的设计哲学
+                2. 设计哲学应体现科幻小说的氛围：宇宙感、科技感、未来感
+                3. **重要**：封面背景色主题必须使用浅色系（如米白、浅灰、淡金等），与内容PDF的vintage-paper风格保持视觉一致性
+                4. 将设计哲学保存为 `STORY_DIR`/chapters/cover-philosophy.md
+                5. 此设计哲学将用于书籍封面和所有章节封面，确保风格一致
+
+            第三步：创建书籍封面（Cover-0）
+                1. 输出进度：「🎨 正在创建书籍封面...」
+                2. 调用 canvas-design skill，传入以下信息：
+                   - 故事名称：`STORY_NAME`
+                   - 类型：书籍封面（整本书的封面，不是章节封面）
+                   - 使用已创建的设计哲学确保风格一致
+                   - 封面上必须清晰显示：中文故事名称、作者信息（可选）
+                   - 设计应更加大气、庄重，体现整部作品的主题
+                3. 将封面保存为 `STORY_DIR`/chapters/Cover-0.pdf
+                4. 输出完成：「✅ 书籍封面已创建」
+
+            第四步：循环创建章节封面
+                对于每个章节（1-5），依次执行：
+                1. 输出进度：「🎨 正在创建第[N]章封面...」
+                2. 调用 canvas-design skill，传入以下信息：
+                   - 故事名称：`STORY_NAME`
+                   - 章节号：第[N]章
+                   - 章节标题（如有）
+                   - 章节描述（从chapter_index.md提取）
+                   - 使用已创建的设计哲学确保风格一致
+                   - 封面上必须清晰显示：故事名称、章节号、章节标题
+                3. 将封面保存为 `STORY_DIR`/chapters/Cover-[N].pdf
+                4. 调用 pdf skill 将封面合并到章节PDF前面：
+                   - 输入：Cover-[N].pdf + `STORY_NAME`-[N].pdf
+                   - 输出：覆盖 `STORY_NAME`-[N].pdf（原文件被替换为带封面版本）
+                5. 输出完成：「✅ 第[N]章封面已创建并合并」
+
+            第五步：合并完整故事PDF
+                1. 输出进度：「📚 正在合并完整故事...」
+                2. 调用 pdf skill 合并所有PDF：
+                   - 输入顺序：Cover-0.pdf + `STORY_NAME`-01.pdf + `STORY_NAME`-02.pdf + `STORY_NAME`-03.pdf + `STORY_NAME`-04.pdf + `STORY_NAME`-05.pdf
+                   - 输出：`STORY_DIR`/`STORY_NAME`.pdf（完整故事PDF）
+                3. 输出完成：「✅ 完整故事PDF已生成」
+
+            第六步：通知用户
+                "✅ **封面创作与故事合并完成！**
+
+                📚 完整故事PDF：
+                - `STORY_DIR`/`STORY_NAME`.pdf（含书籍封面和所有章节）
+
+                📄 章节PDF（含章节封面）：
+                - `STORY_NAME`-01.pdf
+                - `STORY_NAME`-02.pdf
+                - `STORY_NAME`-03.pdf
+                - `STORY_NAME`-04.pdf
+                - `STORY_NAME`-05.pdf
+
+                🎨 封面文件：
+                - Cover-0.pdf（书籍封面）
+                - Cover-1.pdf ~ Cover-5.pdf（章节封面）
+                - cover-philosophy.md（设计哲学）
+
+                所有文件保存在 `STORY_DIR`/ 目录下。"
 
 [指令集 - 前缀 "/"]
     - character：执行 [人物小传创作阶段]
@@ -215,6 +289,7 @@ STORY_DIR: $ARGUMENTS
     - write [章节号]：执行 [章节正文创作阶段]
     - status：执行 [进度查看]
     - pdf：执行 [PDF导出阶段]，将所有章节转换为PDF格式
+    - covers：执行 [章节封面创作阶段]，创建书籍封面(Cover-0)、章节封面(Cover-1~5)，并合并为完整故事PDF
     - help：显示所有可用指令和使用说明
 
 [初始化]
