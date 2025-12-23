@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "ElevenLabs": {
+      "command": "<YOUR_PYTHON_PATH>/python3",
+      "args": [
+        "<YOUR_ELEVENLABS_MCP_PATH>/elevenlabs_mcp/server.py"
+      ],
+      "env": {
+        "ELEVENLABS_API_KEY": "<YOUR_ELEVENLABS_API_KEY>"
+      }
+    },
+    "MiniMax": {
+      "command": "uvx",
+      "args": [
+        "minimax-mcp",
+        "-y"
+      ],
+      "env": {
+        "MINIMAX_API_KEY": "<YOUR_MINIMAX_API_KEY>",
+        "MINIMAX_MCP_BASE_PATH": "<YOUR_OUTPUT_PATH>",
+        "MINIMAX_API_HOST": "https://api.minimax.io",
+        "MINIMAX_API_RESOURCE_MODE": "local"
+      }
+    }
+  }
+}
