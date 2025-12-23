@@ -31,9 +31,15 @@ Extract from user input:
 Read: file_path = <pdf_path>
 ```
 
-### 3. Extract Text
+### 3. Extract Text & Metadata
 
 Extract readable text, skipping page numbers and headers. Keep chapter titles, body text, dialogue.
+
+**Extract metadata for file naming:**
+
+1. **Story Name**: Extract from the PDF's parent directory name (e.g., `/path/我的世界/chapters/file.pdf` → `我的世界`)
+2. **Chapter Number**: Extract from filename pattern `*-XX.pdf` or content like `第X章` (e.g., `我的世界-03.pdf` → `03`)
+3. **Chapter Title**: Extract from the first chapter heading in content (e.g., `第3章：迷宫里的真心话` → `迷宫里的真心话`)
 
 ### 4. Select Voice
 
@@ -57,14 +63,31 @@ For complete voice list, see [references/voices.md](references/voices.md).
 mcp__MiniMax__text_to_audio:
   text: <extracted_text>
   voice_id: <selected_voice_id>
-  output_directory: <same directory as input PDF>
+  output_directory: <audiobook subdirectory in story folder>
   language_boost: "Chinese"
   speed: 1
 ```
 
-### 6. Output
+### 6. Rename Output File
 
-MP3 saved to the same directory as the input PDF.
+After MiniMax generates the MP3, rename it to follow the naming convention:
+
+```
+<STORY_NAME>_<CHAPTER_NUMBER>_<CHAPTER_TITLE>.mp3
+```
+
+**Examples:**
+- `我的世界_03_迷宫里的真心话.mp3`
+- `文明的最后一个变量_01_第一次接触.mp3`
+
+**Rename command:**
+```bash
+mv "<generated_file>.mp3" "<output_directory>/<STORY_NAME>_<CHAPTER_NUMBER>_<CHAPTER_TITLE>.mp3"
+```
+
+### 7. Output
+
+Report the final MP3 path with the properly formatted filename.
 
 ## Quick Reference: Common Voices
 
