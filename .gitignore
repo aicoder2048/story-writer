@@ -9,6 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# MCP config
+.mcp.json
+
 # Story project directories
 AI童年/
 不必要的存在/
@@ -21,7 +24,9 @@ AI童年/
 文明的最后一个变量_V4/
 龙吟月下/
 龙吟月下_V2/
+龙吟月下_V3/
 我的世界/
+我的世界_V2/
 
 # Excluded command files
 .claude/commands/xianyan_writer.md
