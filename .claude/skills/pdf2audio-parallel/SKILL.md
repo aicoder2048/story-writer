@@ -1,11 +1,11 @@
 ---
 name: pdf2audio-parallel
-description: "Parallel PDF to MP3 conversion using MiniMax. Convert multiple PDF chapters to audio simultaneously using parallel subagents. Use when: (1) User says 'generate mp3 for the story of [STORY_NAME]', (2) User says '为故事[STORY_NAME]生成mp3', (3) User says '为故事[STORY_NAME]第[X]章生成mp3', (4) User says 'generate mp3 for story of [STORY_NAME], chapter [X]', (5) Converting a range of PDFs like 'story-[01-05].pdf' to MP3, (6) Batch audiobook creation from PDF chapters. Handles file naming normalization to ensure output matches input pattern."
+description: "Parallel PDF to MP3 conversion using MiniMax. Convert multiple PDF chapters to audio simultaneously using parallel subagents. Use when: (1) User says 'generate mp3 for the story of [STORY_NAME]', (2) User says '为故事[STORY_NAME]生成mp3', (3) User says '为故事[STORY_NAME]第[X]章生成mp3', (4) User says 'generate mp3 for story of [STORY_NAME], chapter [X]', (5) Converting a range of PDFs like 'story-[01-05].pdf' to MP3, (6) Batch audiobook creation from PDF chapters."
 ---
 
 # Parallel PDF to Audio Converter
 
-Convert multiple PDF chapters to MP3 audio in parallel using MiniMax text-to-audio.
+Convert multiple PDF chapters to MP3 audio in parallel by delegating to `/pdf2audio-minimax`.
 
 ## Trigger Phrases
 
@@ -22,13 +22,12 @@ This skill triggers on natural language requests:
 
 **Direct command:**
 ```
-/pdf2audio-parallel "<story_dir>/chapters/<story_name>-[chapter_pattern].pdf" [voice_name] [count]
+/pdf2audio-parallel "<story_dir>/chapters/<story_name>-[chapter_pattern].pdf" [voice_id]
 ```
 
 **Examples:**
-- `/pdf2audio-parallel "重写时间的源代码/chapters/重写时间的源代码-[01-05].pdf" "Cute Spirit" 5`
-- `/pdf2audio-parallel "我的故事/chapters/我的故事-[01, 03-04].pdf" "Gentleman" 3`
-- `/pdf2audio-parallel "星际迷航/chapters/星际迷航-[01-02, 05-07].pdf" "Soft Girl" 5`
+- `/pdf2audio-parallel "重写时间的源代码/chapters/重写时间的源代码-[01-05].pdf"`
+- `/pdf2audio-parallel "我的故事/chapters/我的故事-[01, 03-04].pdf" "Chinese (Mandarin)_Gentleman"`
 
 ## Workflow
 
@@ -47,18 +46,7 @@ ls <STORY_NAME>/chapters/<STORY_NAME>-*.pdf
 - `story_dir`: Story directory name (e.g., `重写时间的源代码`)
 - `story_name`: Story name from filename pattern (usually same as directory)
 - `chapter_pattern`: Chapter numbers (e.g., `01-05` or `[01, 03-04]`)
-- `voice_name`: Voice name for TTS (maps to Voice ID)
-- `count`: Number of parallel agents (= number of chapters to convert)
-
-**Voice Name Mapping:**
-
-| Voice Name | Voice ID |
-|-----------|----------|
-| Cute Spirit | `Chinese (Mandarin)_Cute_Spirit` |
-| Sweet Lady | `Chinese (Mandarin)_Sweet_Lady` |
-| Gentleman | `Chinese (Mandarin)_Gentleman` |
-| Soft Girl | `Chinese (Mandarin)_Soft_Girl` |
-| News Anchor | `Chinese (Mandarin)_News_Anchor` |
+- `voice_id`: Voice ID for TTS (optional, passed to pdf2audio-minimax)
 
 ### 2. Generate Chapter List
 
@@ -81,53 +69,32 @@ Parse the chapter pattern and expand into individual files.
 
 ### 3. Launch Parallel Agents
 
-Use Task tool to spawn N agents simultaneously, each handling one PDF conversion.
+Use Task tool to spawn N agents simultaneously, each calling `/pdf2audio-minimax` for one PDF.
 
 **Agent Prompt Template:**
 
 ```
-Convert PDF to MP3:
-1. Read PDF: <story_dir>/chapters/<story_name>-XX.pdf
-2. Extract text content (skip page numbers/headers)
-3. Convert to audio using mcp__MiniMax__text_to_audio:
-   - text: <extracted_text>
-   - voice_id: <mapped_voice_id>
-   - output_directory: <story_dir>/chapters
-   - language_boost: "Chinese"
-4. After conversion, rename output file to: <story_name>-XX.mp3
+Convert this PDF to MP3 using the pdf2audio-minimax skill:
 
-IMPORTANT: MiniMax may generate files with names like:
-  t2a_第X章:标题_YYYYMMDD_HHMMSS.mp3
+/pdf2audio-minimax <story_dir>/chapters/<story_name>-XX.pdf [voice_id]
 
-You MUST rename to the standard format:
-  <story_name>-XX.mp3
-
-Example: If converting 重写时间的源代码-01.pdf
-  - Expected output: 重写时间的源代码-01.mp3
-  - Wrong output (needs rename): t2a_第1章:完美候选_20251224_090451.mp3
+Example:
+/pdf2audio-minimax 我的故事/chapters/我的故事-01.pdf Chinese (Mandarin)_Gentleman
 ```
 
-### 4. File Naming Normalization
+**IMPORTANT:**
+- Each agent delegates to `/pdf2audio-minimax` which handles:
+  - Reading PDF content
+  - Extracting chapter title from content
+  - Voice selection (auto or specified)
+  - Audio conversion via MiniMax
+  - File naming: `<故事名>_<章节号>_<章节标题>.mp3`
+- This skill only handles parallel orchestration
 
-After each agent completes, verify and fix output filename:
-
-**Expected Format:**
-```
-<story_name>-XX.mp3
-```
-
-**Rename Logic:**
-```bash
-# Find the most recent mp3 in the directory that doesn't match expected pattern
-# Rename to expected pattern
-scripts/rename_audio.py <story_dir>/chapters <story_name> <chapter_number>
-```
-
-### 5. Collect Results
+### 4. Collect Results
 
 Gather outputs from all agents and report:
-- Successfully converted files
-- Final file paths with correct naming
+- Successfully converted files with final paths
 - Any errors encountered
 
 ## Quick Examples
@@ -136,28 +103,28 @@ Gather outputs from all agents and report:
 
 **User Input:**
 ```
-/pdf2audio-parallel "我的故事/chapters/我的故事-[01-03].pdf" "Cute Spirit" 3
+/pdf2audio-parallel "我的故事/chapters/我的故事-[01-03].pdf"
 ```
 
 **Parallel Agent Tasks:**
-1. Agent 1: Convert `我的故事-01.pdf` → `我的故事-01.mp3`
-2. Agent 2: Convert `我的故事-02.pdf` → `我的故事-02.mp3`
-3. Agent 3: Convert `我的故事-03.pdf` → `我的故事-03.mp3`
+1. Agent 1: `/pdf2audio-minimax 我的故事/chapters/我的故事-01.pdf` → `我的故事_01_<标题>.mp3`
+2. Agent 2: `/pdf2audio-minimax 我的故事/chapters/我的故事-02.pdf` → `我的故事_02_<标题>.mp3`
+3. Agent 3: `/pdf2audio-minimax 我的故事/chapters/我的故事-03.pdf` → `我的故事_03_<标题>.mp3`
 
-### Example 2: Mixed Pattern
+### Example 2: With Voice ID
 
 **User Input:**
 ```
-/pdf2audio-parallel "星际迷航/chapters/星际迷航-[01, 03-04].pdf" "Gentleman" 3
+/pdf2audio-parallel "星际迷航/chapters/星际迷航-[01, 03-04].pdf" "Chinese (Mandarin)_Gentleman"
 ```
 
 **Parallel Agent Tasks:**
-1. Agent 1: Convert `星际迷航-01.pdf` → `星际迷航-01.mp3`
-2. Agent 2: Convert `星际迷航-03.pdf` → `星际迷航-03.mp3`
-3. Agent 3: Convert `星际迷航-04.pdf` → `星际迷航-04.mp3`
+1. Agent 1: `/pdf2audio-minimax 星际迷航/chapters/星际迷航-01.pdf Chinese (Mandarin)_Gentleman`
+2. Agent 2: `/pdf2audio-minimax 星际迷航/chapters/星际迷航-03.pdf Chinese (Mandarin)_Gentleman`
+3. Agent 3: `/pdf2audio-minimax 星际迷航/chapters/星际迷航-04.pdf Chinese (Mandarin)_Gentleman`
 
-## Scripts
+## Notes
 
-### scripts/rename_audio.py
-
-Utility script to normalize MP3 filenames after MiniMax generation.
+- Voice selection and file naming are handled by `pdf2audio-minimax`
+- See `pdf2audio-minimax` skill for voice options and naming convention
+- Output files are saved to `<story_dir>/audiobook/` directory
