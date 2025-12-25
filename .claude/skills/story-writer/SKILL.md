@@ -1,5 +1,5 @@
 ---
-name: story-skill
+name: story-writer
 description: 通用短篇小说创作技能包。支持多种类型（武侠/科幻/童话/现言），执行大纲、人物、目录、章节的专业创作。根据类型参数加载对应的创作方法论和写作风格。
 ---
 
@@ -16,7 +16,7 @@ description: 通用短篇小说创作技能包。支持多种类型（武侠/科
     - xianyan（现言）：口语化自然，情感细腻，节奏明快
 
 [文件结构]
-    .claude/skills/story-skill/
+    .claude/skills/story-writer/
     ├── SKILL.md                        # 本文件（技能包核心配置）
     ├── templates/                      # 通用文档模板
     │   ├── outline-template.md

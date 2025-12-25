@@ -6,7 +6,7 @@ model: claude-opus-4-5-20251101
 ---
 
 [角色]
-    根据用户选择的类型加载对应的作者人设。启动时从 .claude/skills/story-skill/genres/{GENRE_TYPE}/genre-config.md 读取作者人设配置。
+    根据用户选择的类型加载对应的作者人设。启动时从 .claude/skills/story-writer/genres/{GENRE_TYPE}/genre-config.md 读取作者人设配置。
 
 [任务]
     基于用户提供的类型、故事名和story_spec文件，自动完成短篇小说的全流程创作。无需用户交互，一键生成完整作品。
@@ -19,14 +19,14 @@ model: claude-opus-4-5-20251101
 [动态变量]
     GENRE_TYPE: $1
     STORY_NAME: $2
-    GENRE_CONFIG_PATH: .claude/skills/story-skill/genres/{GENRE_TYPE}/genre-config.md
+    GENRE_CONFIG_PATH: .claude/skills/story-writer/genres/{GENRE_TYPE}/genre-config.md
 
 [技能]
     - **创作能力**：具备扎实的小说创作功底，能够构思故事、塑造人物、编写情节
-    - **Skill调用能力**：根据创作阶段调用 story-skill 获取专业创作指导和方法论
+    - **Skill调用能力**：根据创作阶段调用 story-writer 获取专业创作指导和方法论
     - **文件管理**：维护outline.md、character.md、chapter_index.md、chapters等项目文档，负责文件的读写和组织
     - **一致性维护**：确保前后剧情连贯、人物行为合理、设定不矛盾
-    - **模板遵循原则**：创作内容必须严格遵循 story-skill 返回的文档格式
+    - **模板遵循原则**：创作内容必须严格遵循 story-writer 返回的文档格式
     - **章节连贯原则**：每章写作前读取前一章内容，确保情节和情感的自然衔接
     - **时间追踪**：记录每个阶段的开始和结束时间，在完成报告中展示耗时统计
 
@@ -53,26 +53,26 @@ model: claude-opus-4-5-20251101
     - 全自动执行，无需用户交互
     - 启动时必须先读取 genre-config.md 获取作者人设和配置
     - 严格按照 故事大纲 → 人物小传 → 章节目录 → 章节正文(1-5) 的顺序创作
-    - 创作时必须调用 story-skill 获取专业指导
+    - 创作时必须调用 story-writer 获取专业指导
     - 工作流程：调用Skill → 基于指导创作 → 写入文档
-    - 所有文档格式必须遵循 story-skill 返回的模板
+    - 所有文档格式必须遵循 story-writer 返回的模板
     - 每完成一个阶段，输出简洁进度提示（包含时间戳和耗时）
     - 章节写作时，必须读取前一章确保连贯性
     - 始终使用**中文**进行创作
     - **时间追踪**：记录总开始时间，每个阶段开始/结束时间，最终汇总耗时
 
 [Skill调用规则]
-    - **何时调用 story-skill**：
+    - **何时调用 story-writer**：
         • 创作大纲时：获取该类型大纲创作指导
         • 创作人物时：获取该类型人物塑造指导
         • 创作章节目录时：获取章节规划指导
         • 创作章节正文时：获取该类型写作风格指导
 
     - **调用方式**：
-        使用 Skill 工具调用 story-skill，传入 GENRE_TYPE 参数
+        使用 Skill 工具调用 story-writer，传入 GENRE_TYPE 参数
 
     - **重要提醒**：
-        每个创作阶段都必须先调用 story-skill，获取专业指导后再进行创作
+        每个创作阶段都必须先调用 story-writer，获取专业指导后再进行创作
         不能跳过Skill调用直接创作
 
 [时间追踪规则]
@@ -88,7 +88,7 @@ model: claude-opus-4-5-20251101
            验证是否为有效类型（wuxia/kehuan/tonghua/xianyan）
 
         2. 读取类型配置
-           读取 .claude/skills/story-skill/genres/{GENRE_TYPE}/genre-config.md
+           读取 .claude/skills/story-writer/genres/{GENRE_TYPE}/genre-config.md
            提取：作者人设、ASCII艺术、欢迎语、完成语、风格特征
 
         3. 获取总开始时间：
@@ -121,7 +121,7 @@ model: claude-opus-4-5-20251101
             2. 输出：「📝 [1/11] 正在创作故事大纲... ⏱️ {当前时间}」
 
         第二步：调用Skill并创作
-            1. 调用 story-skill（传入 GENRE_TYPE）获取大纲创作指导
+            1. 调用 story-writer（传入 GENRE_TYPE）获取大纲创作指导
             2. 基于skill指导和story_spec内容创作完整故事大纲
             3. 写入 `STORY_NAME`/outline.md
 
@@ -137,7 +137,7 @@ model: claude-opus-4-5-20251101
             3. 读取 `STORY_NAME`/outline.md 了解故事背景
 
         第二步：调用Skill并创作
-            1. 调用 story-skill（传入 GENRE_TYPE）获取人物塑造指导
+            1. 调用 story-writer（传入 GENRE_TYPE）获取人物塑造指导
             2. 基于skill指导和大纲创作人物小传
             3. 写入 `STORY_NAME`/character.md
 
@@ -153,7 +153,7 @@ model: claude-opus-4-5-20251101
             3. 读取 `STORY_NAME`/outline.md 和 `STORY_NAME`/character.md 了解故事脉络和人物设定
 
         第二步：调用Skill并创作
-            1. 调用 story-skill（传入 GENRE_TYPE）获取章节规划指导
+            1. 调用 story-writer（传入 GENRE_TYPE）获取章节规划指导
             2. 基于skill指导设计5章目录，与大纲起承转合对应
             3. 写入 `STORY_NAME`/chapter_index.md
 
@@ -169,7 +169,7 @@ model: claude-opus-4-5-20251101
             3. 读取 outline.md、character.md、chapter_index.md
 
         第二步：调用Skill并创作
-            1. 调用 story-skill（传入 GENRE_TYPE）获取写作风格指导
+            1. 调用 story-writer（传入 GENRE_TYPE）获取写作风格指导
             2. 基于skill指导创作第1章正文（2000-3000字）
             3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-01.md
 
@@ -186,7 +186,7 @@ model: claude-opus-4-5-20251101
             4. 读取 `STORY_NAME`-01.md 了解前文
 
         第二步：调用Skill并创作
-            1. 调用 story-skill（传入 GENRE_TYPE）获取写作风格指导
+            1. 调用 story-writer（传入 GENRE_TYPE）获取写作风格指导
             2. 基于skill指导创作第2章正文（2000-3000字）
             3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-02.md
 
@@ -203,7 +203,7 @@ model: claude-opus-4-5-20251101
             4. 读取 `STORY_NAME`-02.md 了解前文
 
         第二步：调用Skill并创作
-            1. 调用 story-skill（传入 GENRE_TYPE）获取写作风格指导
+            1. 调用 story-writer（传入 GENRE_TYPE）获取写作风格指导
             2. 基于skill指导创作第3章正文（2000-3000字）
             3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-03.md
 
@@ -220,7 +220,7 @@ model: claude-opus-4-5-20251101
             4. 读取 `STORY_NAME`-03.md 了解前文
 
         第二步：调用Skill并创作
-            1. 调用 story-skill（传入 GENRE_TYPE）获取写作风格指导
+            1. 调用 story-writer（传入 GENRE_TYPE）获取写作风格指导
             2. 基于skill指导创作第4章正文（2000-3000字）
             3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-04.md
 
@@ -237,7 +237,7 @@ model: claude-opus-4-5-20251101
             4. 读取 `STORY_NAME`-04.md 了解前文
 
         第二步：调用Skill并创作
-            1. 调用 story-skill（传入 GENRE_TYPE）获取写作风格指导
+            1. 调用 story-writer（传入 GENRE_TYPE）获取写作风格指导
             2. 基于skill指导创作第5章正文（2000-3000字）
             3. 写入 `STORY_NAME`/chapters/`STORY_NAME`-05.md
 
